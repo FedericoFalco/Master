@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import Undefined from class_script
+import Undefined from utils
 
 def get_dataset(dataset):
   # retrieving data in a Pandas df
