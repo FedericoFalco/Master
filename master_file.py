@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
-import Undefined from utils
+import Undefined, merge_ratings_movies from utils
 
-def get_dataset(dataset):
+def chatGPT_recommender(model,dataset):
+  # using the Open_AI function created to call the ChatGPT API
+  if model == 'gpt-3.5-turbo-1106':
+    recommender = 
+    
   # retrieving data in a Pandas df
   if dataset == 'facebook_book':
     train_set = pd.read_csv('../trainingset_with_name.tsv', sep="\t",
@@ -23,4 +27,14 @@ def get_dataset(dataset):
                             header=None, names=['movieId','title','genre'],
                             usecols=['movieId','title'])
     train_set = merge_ratings_movies(ratings,movies)
+    trainset = Undefined(train_set)
+  else:
+    print('No dataset found')
+    exit()
+
+# iterating over users included in the dataset
+for user in trainset['userId'].unique():
+  message = ''
+  if dataset = 
+
     
