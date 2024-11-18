@@ -7,10 +7,17 @@ class Undefined:
     def __init__(self,data):
         self.data = data
 
+    def book_read(self,user_ID):
+        book_user = self.data[self.data['userID'] == user_ID]
+        book_user = book_user['name','rating','bookID'].sort_values('rating',ascending=0)
+        book_user = book_user['name'].to_numpy()
+        sentence = "The user {user_ID} likes the following books: {book_user}"
+    return sentence
+
 def merge_ratings_movies(df_ratings,df_movies)
 # left join between ratings and movies to preserve all the ratings rows
-    df_ratings = pd.merge(df_ratings, df_movies, how='left', on='movieId')
-    del df_ratings['movieId']
+    df_ratings = pd.merge(df_ratings, df_movies, how='left', on='movieID')
+    del df_ratings['movieID']
     return df_ratings
     
 class Open_AI():
