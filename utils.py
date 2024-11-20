@@ -9,10 +9,24 @@ class Undefined:
 
     def book_read(self,user_ID):
         book_user = self.data[self.data['userID'] == user_ID]
-        book_user = book_user['name','rating','bookID'].sort_values('rating',ascending=0)
+        book_user = book_user[['name','rating','bookID']].sort_values('rating',ascending=0)
         book_user = book_user['name'].to_numpy()
         sentence = "The user {user_ID} likes the following books: {book_user}"
-    return sentence
+        return sentence
+
+    def artists_listened(self,user_ID):
+        artists_listened = self.data[self.data['userID'] == 'user_ID']
+        artists_listened = artists_listened[['name','weight']].sort_values('rating',ascending=0)
+        artists_listened = artists_listened['name'].to_numpy()
+        sentence = "The user {user_ID} listens to the following artists: {artists_listened}"
+        return sentence
+
+    def movie_rated(self,user_ID):
+        movie_rated = self.data[self.data['userID'] == 'user_ID']
+        movie_rated = movie_rated[['movie','rating']]
+        movie_rated = ", ".join(str(row['title']) + f{"int(row['rating'])} out of 5" for _,row in movie_rated.iterrows())
+        sentence = "The user {user_ID} likes the following movies: {movie_rated}"
+        return sentence
 
 def merge_ratings_movies(df_ratings,df_movies)
 # left join between ratings and movies to preserve all the ratings rows
@@ -20,12 +34,12 @@ def merge_ratings_movies(df_ratings,df_movies)
     del df_ratings['movieID']
     return df_ratings
     
-class Open_AI():
+class Open_AI:
     # constructor method for ensuring that, when instanced, a new object of this class has its own model
     def __init__(self,model):
         self.model = model
 
-    def question(self,message):
+    def request(self,message):
         # calling the OpenAI api
         client = OpenAI(api_key = 'tbd')
         # setting the conversation
