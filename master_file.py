@@ -3,6 +3,7 @@ import numpy as np
 import utils
 import openai
 from utils import Undefined, Open_AI
+import os
 
 def chatGPT_recommender(model, dataset):
     recommender = None
@@ -52,6 +53,9 @@ def chatGPT_recommender(model, dataset):
     # passing the message to ChatGPT, by applying the pre-defined method 'request' on the object of class 'recommender'
     response = recommender.request(message)
     return response
+
+    # creating a text file through the library os
+    file = os.path.join(
 
 # calling the function chatGPT_recommender
 model = 'gpt-3.5-turbo-instruct-0914'
