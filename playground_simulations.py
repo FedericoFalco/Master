@@ -2,17 +2,17 @@ import requests
 from groq import Groq
 import pandas as pd
 import os
-#carico il dataset dei libri come un dataframe pandas
+# carico il dataset dei libri come un dataframe pandas
 data_set = pd.read_csv('/Users/IG45918/PycharmProjects/pythonProject/Project work/Datasets/trainingset_with_name.tsv', sep='\t',
                         header=None, names=['userID', 'bookID', 'rating', 'name'],
                         usecols=['userID', 'bookID', 'rating', 'name'])
-#estraggo le sole preferenze del primo utente
+# estraggo le sole preferenze del primo utente
 userID = 1
 train_set = data_set[data_set['userID'] == userID].iloc[0:4]
 test_set = data_set[data_set['userID'] == userID].iloc[5:10]
 train_set = train_set[['name','rating','bookID']].sort_values('rating',ascending=False)
 user_pref = ', '.join(str(row['name']) for _,row in train_set.iterrows())
-#creo i 3 prompt
+# creo i 3 prompt
 prompt_CoT_0 = f"The user {userID} likes the following books: {user_pref}. Think step by step and then\
             provide me 5 ranked suggestions, based on these preferences: provide names only, nothing else."
 prompt_CoT_1 = f"Q) I like Sapiens by Harari and The selfish gene by Dawkins, provide me 1 suggestion, based on these preferences:\
