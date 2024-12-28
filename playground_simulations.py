@@ -33,7 +33,7 @@ prompts = {
     "prompt_GK":prompt_GK
 }
 #creo l' chiave per l' api
-apikey = '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'
+apikey = '___'
 #istanziare il client
 client = Groq(api_key = apikey)
 #quali modelli voglio interrogare?
