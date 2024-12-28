@@ -1,0 +1,18 @@
+Step 1: Identify common themes in the user's preferred books:
+- Existentialism and philosophical themes (The Unbearable Lightness of Being, Crime and Punishment)
+- Dystopian or alternate world settings (Brave New World, Harry Potter)
+- Psychological depth and complex characters (The Unbearable Lightness of Being, Crime and Punishment, Harry Potter)
+
+Step 2: Analyze the user's preferences for literary style:
+- The user seems to appreciate complex, thought-provoking fiction with well-developed characters.
+
+Step 3: Consider the user's interest in genre:
+- The user appears to enjoy a mix of literary fiction, dystopian fiction, and fantasy.
+
+Step 4: Provide ranked suggestions based on the user's preferences:
+
+1. 1984
+2. The Handmaid's Tale
+3. The Picture of Dorian Gray
+4. The Stranger
+5. The Giver
