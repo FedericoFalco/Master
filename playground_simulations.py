@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-#carico il dataset dei libri come un dataframe pandas
+# carico il dataset dei libri come un dataframe pandas
 data_set = pd.read_csv('/Users/IG45918/PycharmProjects/pythonProject/Project work/Datasets/trainingset_with_name.tsv', sep='\t',
                         header=None, names=['userID', 'bookID', 'rating', 'name'],
                         usecols=['userID', 'bookID', 'rating', 'name'])
