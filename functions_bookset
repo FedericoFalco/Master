@@ -18,22 +18,23 @@ def ndcg(recommendations,preferences):
         idcg += 1/math.log2(2+i)
     return dcg/idcg if idcg > 0 else 0
 
-# definisco una funzione per performare le simulazioni
+# definisco una funzione per fare le simulazioni
 def simulation(data_set, models_list, client, users_list, num_of_users, train_ratio, recomm_to_test, directory):
 
     # creo dizionario per archiviare liste di recommendations
     recommendations = {}
 
-    # creo dizionario per archiviare indici di Jaccard
+    # creo dizionario per archiviare risultati e metriche
     data = {'train_ratio': [0], 'user': [0], 'model': [0], 'prompt': [0], 'jaccard': [0],
             'test_set': [0], 'recommendations': [0], 'precision': [0], 'recall': [0], 'NDCG': [0]}
     df_output = pd.DataFrame(data)
 
-    # ciclo per utente, modello e prompt
+    # itero per utente, modello e prompt
     for userID in users_list[0:num_of_users]:
         userID = int(userID)
-        # quanti item, tra quelli disponibili, passo nel prompt come preferenze note dell' utente?
-        train_set_size = int(len(users_list) * train_ratio)
+        # quanti item, tra quelli disponibili, passo nel prompt al modello come preferenze note dell' utente?
+        set_size = len(data_set[data_set['userID'] == userID])
+        train_set_size = int(set_size * train_ratio)
         train_set = data_set[data_set['userID'] == userID].iloc[0:train_set_size]
         test_set = data_set[data_set['userID'] == userID].iloc[train_set_size:]
         train_set = train_set[['name', 'rating', 'bookID']].sort_values('rating', ascending=False)
@@ -113,17 +114,21 @@ def simulation(data_set, models_list, client, users_list, num_of_users, train_ra
                     # salvo la risposta in un file di testo
                     with open(file, 'w') as f:
                         f.write(response)
+
                     # converto la risposta in una lista iterabile
                     for i in range(0, recommended_items - 1):
                         index_start = response.find(f"{i + 1}.")
                         index_end = response.find(f"{i + 2}.")
                         response_to_list.append(str(response[index_start + 3:index_end - 1]))
-                    response_to_list.append(str(response[index_end + 3:]))
+                        response_to_list.append(str(response[index_end + 3:]))
+
                     response_to_list = [re.sub(r"\(.*?\)", "", frase).strip() for frase in response_to_list]
                     # print(f"Suggestions are:\n{response_to_list}")
+
                     # salvo la risposta come lista in un dizionario
                     recommendations[f"train_ratio_{train_ratio * 100}_user{userID}_{my_model}_{type_prompt}"] = [response_to_list]
 
+                    '''
                     # stampo l'id degli item suggeriti e presenti nel test_set
                     matchings = test_set[test_set['name'].apply(lambda x: x in response_to_list)][['name', 'bookID']]
 
@@ -132,6 +137,7 @@ def simulation(data_set, models_list, client, users_list, num_of_users, train_ra
                     else:
                         print(f"For the user {userID}, the model {my_model}, prompted with {type_prompt}, has recommended the following items already "
                           f"known to be appreciated:\n {matchings}")
+                    '''
 
                     # calcolo le metriche
                     jacc = (len(set(response_to_list) & reference_set) / len(set(response_to_list) | reference_set))
@@ -141,7 +147,10 @@ def simulation(data_set, models_list, client, users_list, num_of_users, train_ra
 
                     # aggiorno il dataframe di output con i risultati dell' iterazione
                     row = pd.DataFrame(
-                        {'train_ratio': [f"{train_ratio:.0%}"], 'user': [userID], 'model': [my_model], 'prompt': [type_prompt],
+                        {'train_ratio': [f"{train_ratio:.0%}"],
+                         'user': [userID],
+                         'model': [my_model],
+                         'prompt': [type_prompt],
                          'jaccard': [jacc], #[f"{jacc:.1%}"],
                          'test_set': [reference_set],
                          'recommendations': [response_to_list],
