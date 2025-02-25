@@ -1,0 +1,137 @@
+import pandas as pd
+from functions_movieset import simulation, remove_parentheses
+from groq import Groq
+import numpy as np
+import time
+import matplotlib as plt
+
+# carico il dataset delle preferenze come un dataframe pandas
+data_set = pd.read_csv('/Users/IG45918/PycharmProjects/pythonProject/Project work/Datasets/subset_train_230.tsv',
+                       sep='\t', header=None, names=['userID', 'movieID', 'rating'], usecols=['userID', 'movieID', 'rating'])
+
+# carico l'elenco di associazioni film-id
+movies_ids = pd.read_csv('/Users/IG45918/PycharmProjects/pythonProject/Project work/Datasets/movies.csv',
+                        sep=',', header=0, names=['movieID','title','genres'], usecols=['movieID','title'])
+data_set = pd.merge(data_set,movies_ids, how='left', on='movieID')
+
+# creo il nome della directory dove archiviare le risposta
+directory = '/Users/IG45918/PycharmProjects/pythonProject/Project work/Playground_movies'
+
+# qual è il numero massimo di item per utente
+grouped = data_set.groupby(by='userID').count().sort_values(by='movieID', ascending=False)
+
+# estraggo gli utenti che abbiano almeno 50 item come preferenze
+userID_50 = grouped[grouped['movieID'] >= 50]
+data_set = data_set[data_set['userID'].isin(userID_50.index)]
+data_set['title'] = data_set['title'].apply(remove_parentheses)
+
+# inserisco la chiave api
+apikey = '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'
+
+# istanziare il client
+client = Groq(api_key=apikey)
+
+# quali modelli voglio interrogare?
+models = ['LLaMa-3.3-70b-versatile', "LLaMa-3.2-3b-preview", "LLaMa-3.2-1b-preview","LLaMa-3.1-8b-instant"]
+
+# estraggo l' elenco di utenti
+users = data_set['userID'].unique()
+
+'''
+# cerco il valore di train_ratio che massimizzi la metrica di Jaccard -> __
+data = {'train_ratio': [0], 'jaccard': [0]}
+jaccard_vec = pd.DataFrame(data)
+
+for i in np.linspace(0.2,0.7,6):
+    time.sleep(600)
+    df_output = simulation(data_set=data_set,models_list=models,client=client,users_list=users,num_of_users=10,train_ratio=i,
+                            recomm_to_test=1,directory=directory)
+    row = pd.DataFrame({'train_ratio': [i],'jaccard': max(df_output['jaccard'])})
+    jaccard_vec = pd.concat([row,jaccard_vec])
+print(jaccard_vec)
+
+'''
+# fisso il train ratio al 50% e salvo in un excel i risultati delle simulazioni, che devo svolgere in 3 sessioni per ragioni di saturazione dell' API
+quarto = len(users)//8
+'''
+time.sleep(900)
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[:quarto], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_1.xlsx')
+
+# raggruppo i risultati per prompt e per modello
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_1.xlsx')
+
+time.sleep(900)
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[quarto:(2*quarto)], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_2.xlsx')
+
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_2.xlsx')
+
+time.sleep(900)
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[(2*quarto):(3*quarto)], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_3.xlsx')
+
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_3.xlsx')
+
+time.sleep(900)
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[(3*quarto):(4*quarto)], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_4.xlsx')
+
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_4.xlsx')
+
+time.sleep(900)
+'''
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[(4*quarto):(5*quarto)], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_5.xlsx')
+
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_5.xlsx')
+
+time.sleep(900)
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[(5*quarto):(6*quarto)], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_6.xlsx')
+
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_6.xlsx')
+
+time.sleep(900)
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[(6*quarto):(7*quarto)], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_7.xlsx')
+
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_7.xlsx')
+
+time.sleep(900)
+df_output = simulation(data_set=data_set, models_list=models, client=client, users_list=users[(7*quarto):(8*quarto)], num_of_users=quarto,
+                        train_ratio=0.5, recomm_to_test=1, directory=directory)
+print(df_output)
+df_output.to_excel('simulations_8.xlsx')
+
+results = df_output.drop(['user','train_ratio','test_set','recommendations'], axis=1).groupby(['model','prompt']).mean()
+print(results)
+results.to_excel('results_8.xlsx')
